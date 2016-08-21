@@ -36,7 +36,7 @@ class Logger(object):
         # log progress to terminal
         if self.opts.verbose:
             if self.opts.in_validation:
-                mean_reward = np.mean(self.info['validation_reward'][-1000:])
+                mean_reward = np.mean(self.info['validation_reward'][-5000:])
                 txt = '\rvalidation reward: {:.6f}\n'.format(mean_reward)
             else: 
                 # compute mean loss and rewards over number of past steps
@@ -67,9 +67,9 @@ class Logger(object):
         weights = network.get_params()
 
         # collect state means and stds and save with weights
-        state_means = adapter.state_means
-        state_stds = adapter.state_stds
-        np.savez(filepath, *weights, state_means=state_means, state_stds=state_stds)
+        state_means = adapter.means
+        state_ranges = adapter.ranges
+        np.savez(filepath, *weights, state_means=state_means, state_ranges=state_ranges)
 
     def log_options(self):
         """

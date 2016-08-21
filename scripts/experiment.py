@@ -42,7 +42,6 @@ class Experiment(object):
         """
         obs = self.env.reset()
         action_idx = self.agent.start_episode(obs)
-        action_idx = 1
         for step in xrange(self.opts.max_steps):
             # get the next state and reward
             next_obs, reward, terminal, _ = self.env.step(action_idx)
@@ -56,7 +55,6 @@ class Experiment(object):
 
             # inform the agent and get a new action_idx
             action_idx = self.agent.step(next_obs, reward, terminal)
-            action_idx = 1
 
             # if episode has ended, then break
             if terminal:

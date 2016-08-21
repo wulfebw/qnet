@@ -99,9 +99,12 @@ class Agent(object):
         (states, action_idxs, rewards, next_states, 
             terminals) = self.replay_memory.sample_batch()
 
-        # temp
-        states = np.squeeze(states, axis=1)
-        next_states = np.squeeze(next_states, axis=1)
+        # print 'states: {}'.format(states)
+        # print 'action_idxs: {}'.format(action_idxs)
+        # print 'next_states {}'.format(next_states)
+        # print 'rewards: {}'.format(rewards)
+        # print 'terminals: {}'.format(terminals)
+        # raw_input()
 
         # pass to network to perform training
         loss = self.network.train(
@@ -129,10 +132,7 @@ class Agent(object):
 
         # action choice depends on qvalues so use separate class
         # for actual action selection
-
         q_values = self.network.get_q_values(state)
-        # print state
-        # print q_values
         action_idx = self.policy.choose_action_index(q_values)
         return action_idx
 
@@ -211,7 +211,7 @@ class SequenceAgent(Agent):
     def get_action_idx(self, state):
         """
         Gets an action given the current state. 
-        
+        counter
         args:
             - state: the state used to determine the action
         """
@@ -221,9 +221,5 @@ class SequenceAgent(Agent):
             return self.policy.random_action_index()
 
         sequence = self.replay_memory.make_last_sequence(state)
-
-        # temp
-        sequence = sequence.flatten()
-
         q_values = self.network.get_q_values(sequence)
         return self.policy.choose_action_index(q_values)

@@ -40,6 +40,18 @@ class RangeAdapter(object):
         # is, so long as it is not zero since this gives 
         # 0/0 which is undefined, yo.
         self.ranges[self.ranges == 0] = 1
+        
+        # if opts.high / low is invalid then ranges
+        # or means might be nan or inf, so confirm
+        # that that is not the case
+        print self.ranges
+        print self.means
+        print opts.high
+        print opts.low
+        assert not np.any(np.isnan(self.ranges))
+        assert not np.any(np.isinf(self.ranges))
+        assert not np.any(np.isnan(self.means))
+        assert not np.any(np.isinf(self.means))
 
     def normalize_state(self, state):
         state = np.subtract(state, self.means)
@@ -49,7 +61,8 @@ class RangeAdapter(object):
 class IdentityAdapter(object):
 
     def __init__(self, opts=None):
-        pass
+        self.means = []
+        self.ranges = []
 
     def normalize_state(self, state):
         if len(np.shape(state)) == 0:
