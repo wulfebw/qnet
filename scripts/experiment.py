@@ -46,13 +46,6 @@ class Experiment(object):
             # get the next state and reward
             next_obs, reward, terminal, _ = self.env.step(action_idx)
 
-            # print 'obs: {}'.format(obs)
-            # print 'action_idx: {}'.format(action_idx)
-            # print 'next_obs {}'.format(next_obs)
-            # print 'reward: {}'.format(reward)
-            # print 'terminal: {}'.format(terminal)
-            # raw_input()
-
             # inform the agent and get a new action_idx
             action_idx = self.agent.step(next_obs, reward, terminal)
 

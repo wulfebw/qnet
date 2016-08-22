@@ -1,0 +1,1 @@
+Network snapshots will be saved to this directory.

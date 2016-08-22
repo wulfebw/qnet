@@ -1,3 +1,6 @@
+"""
+Main script to build everything and run an experiment.
+"""
 
 import gym
 import numpy as np
@@ -21,10 +24,6 @@ def get_env(opts):
     # about that environment to the options object that 
     # is used in creating the other classes in the experiment
 
-    # # add stuff to debugging mdps
-    # if 'shape' not in env.observation_space.__dict__:
-    #     env.observation_space.shape = (1,)
-
     if len(env.observation_space.shape) > 1:
         msg = 'multidimensional observation space not implemented'
         raise ValueError(msg)
@@ -39,7 +38,12 @@ def get_env(opts):
 
 def get_agent(opts):
     print 'building agent...'
-    qnet = qnetwork.QNetwork(opts)
+    if opts.network_type == 'dqn':
+        qnet = qnetwork.SequenceQNetwork(opts)
+    elif opts.network_type == 'rqn':
+        qnet = recurrent_qnetwork.RecurrentQNetwork(opts.network_type)
+    else:
+        raise ValueError('invalid network type: {}'.format())
 
     if opts.load_weights_filepath != '':
         if not os.path.exists(opts.load_weights_filepath):
@@ -50,11 +54,16 @@ def get_agent(opts):
 
     # policy and replay memory
     p = policy.EpsilonGreedy(opts)
-    rm = replay_memory.ReplayMemory(opts)
+    rm = replay_memory.SequenceReplayMemory(opts)
     
     # state adapter
-    sa = state_adapter.RangeAdapter(opts)
-    #sa = state_adapter.IdentityAdapter()
+    if opts.state_adapter_type == 'range':
+        sa = state_adapter.RangeAdapter(opts)
+    elif opts.state_adapter_type == 'identity':
+        sa = state_adapter.IdentityAdapter()
+    else:
+        raise ValueError('invalid state adapter type: {}'.format(
+                opts.state_adapter_type))
     # if loading weights, load in the means and ranges
     if opts.load_weights_filepath != '':
         d = np.load(opts.load_weights_filepath)
@@ -62,7 +71,11 @@ def get_agent(opts):
         sa.state_stds = d['state_stds']
 
     l = logger.Logger(opts)
-    a = agent.Agent(network=qnet, policy=p, replay_memory=rm, 
+
+    # only use sequence agent
+    # if you want to only consider a single frame at a time, then 
+    # just set sequence_length to 1
+    a = agent.SequenceAgent(network=qnet, policy=p, replay_memory=rm, 
             state_adapter=sa, log=l, opts=opts)
     return a
 

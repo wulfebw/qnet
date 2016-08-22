@@ -39,14 +39,15 @@ class TestOptions(object):
 def test_overfit_simple_artificial_dataset():
         opts = TestOptions()
         opts.state_dim = 1
-        opts.batch_size = 2 ** 6
+        opts.batch_size = 2 ** 7
         opts.replay_capacity = 2 ** 16
         opts.num_hidden = 128
+        opts.learning_rate = 0.00001
         opts.num_hidden_layers = 2
         opts.discount = 0
         opts.num_actions = 2
         opts.regularization = 1e-5
-        opts.dropout = 0.5
+        opts.dropout = 0.0
 
         network = qnetwork.QNetwork(opts)
         rm = replay_memory.ReplayMemory(opts)
@@ -66,7 +67,7 @@ def test_overfit_simple_artificial_dataset():
         counter = 0
         losses = []
         max_iterations = 10000
-        Q = {}
+        q_values = []
         for _ in range(max_iterations):
             counter += 1
             states, actions, rewards, next_states, terminals = rm.sample_batch()
@@ -75,7 +76,9 @@ def test_overfit_simple_artificial_dataset():
 
             if counter % 100 == 0:
                 q_values = network.get_q_values(np.array([0]))
-                print q_values
+
+        np.testing.assert_array_almost_equal(q_values, [2.5, 2.0], 1)
+                
 
 
 test_overfit_simple_artificial_dataset()

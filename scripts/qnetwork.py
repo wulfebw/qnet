@@ -1,3 +1,7 @@
+"""
+This QNetwork borrows heavily from:
+https://github.com/spragunr/deep_q_rl
+"""
 
 import lasagne
 from lasagne.regularization import regularize_network_params, l2
@@ -312,6 +316,11 @@ class QNetwork(object):
         self.reset_target_network()
 
 class SequenceQNetwork(QNetwork):
+    """
+    A QNetwork that potentially takes in multiple frames. This 
+    does not need to be a separate class and could be merged with 
+    the regular QNetwork (overlooked this initially).
+    """
 
     def __init__(self, opts):
         """
@@ -427,10 +436,6 @@ class SequenceQNetwork(QNetwork):
                 np.array(self.opts.learning_rate, dtype=np.float32))
         updates = lasagne.updates.adamax(
                 loss, params, self.learning_rate_shared)
-
-        # updates = lasagne.updates.sgd(
-        #         loss, params, self.learning_rate_shared)
-        # updates = lasagne.updates.apply_nesterov_momentum(updates, momentum=.8)
 
         # 6. compile theano functions for training and for getting q_values
         givens = {

@@ -1,0 +1,1 @@
+Gym environment run outputs will be placed in this directory.

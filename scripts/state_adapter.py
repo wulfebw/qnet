@@ -44,10 +44,6 @@ class RangeAdapter(object):
         # if opts.high / low is invalid then ranges
         # or means might be nan or inf, so confirm
         # that that is not the case
-        print self.ranges
-        print self.means
-        print opts.high
-        print opts.low
         assert not np.any(np.isnan(self.ranges))
         assert not np.any(np.isinf(self.ranges))
         assert not np.any(np.isnan(self.means))
@@ -61,6 +57,7 @@ class RangeAdapter(object):
 class IdentityAdapter(object):
 
     def __init__(self, opts=None):
+        # need these for compatability with logger
         self.means = []
         self.ranges = []
 

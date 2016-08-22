@@ -46,7 +46,7 @@ def get_options():
     opts.regularization = 0.0
     opts.print_every = 25
     opts.sequence_length = 1
-    opts.network_type = 'single_layer_gru'
+    opts.subnetwork_type = 'single_layer_lstm'
     opts.rnn_grad_clip = 2
     return opts
 
@@ -101,9 +101,7 @@ class TestSequenceAgent(unittest.TestCase):
         opts.min_exploration_prob = 0.05
         opts.max_quadratic_loss = 50.0 
         opts.exploration_reduction = 1e-7
-        opts.env_name = 'CartPole-v0'
-        # opts.load_weights_filepath = '../../../../data/snapshots/test_run/weights_1000.npz'
-
+        opts.env_name = 'CartPole-v0' # 'LunarLander-v2'
         opts.sequence_length = 4
 
         # environment
@@ -149,21 +147,18 @@ class TestSequenceAgentWithRecurrentNetwork(unittest.TestCase):
         opts.decay_lr_every = 500
         opts.freeze_interval = 10
         opts.num_hidden = 128
-        opts.num_hidden_layers = 3
-        opts.discount = .99
+        opts.discount = .999
         opts.dropout_prob = 0.0
-        opts.regularization = 0.0
+        opts.regularization = 1e-5
         opts.train_updates_per_episode = 1
         opts.exploration_prob = 0.3
         opts.min_exploration_prob = 0.05
         opts.max_quadratic_loss = 50.0 
         opts.exploration_reduction = 1e-6
-        opts.network_type = 'connected_clockwork_lstm'
-        opts.rnn_grad_clip = 100
-        opts.env_name = 'LunarLander-v2'
-        #opts.load_weights_filepath = '../../../../data/snapshots/test_run/weights_5000.npz'
-
-        opts.sequence_length = 4
+        opts.subnetwork_type = 'single_layer_lstm'
+        opts.rnn_grad_clip = 10
+        opts.env_name = 'CartPole-v0' # 'LunarLander-v2'
+        opts.sequence_length = 3
 
         # environment
         env = gym.make(opts.env_name)

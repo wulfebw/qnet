@@ -8,6 +8,9 @@ import sys
 import time
 
 class Logger(object):
+    """
+    Logging class.
+    """
 
     def __init__(self, opts):
         self.opts = opts

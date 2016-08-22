@@ -10,8 +10,8 @@ class DefaultOptions(object):
 
         # env
         # 'TwoRoundNondeterministicReward-v0' 'OneRoundNondeterministicReward-v0' 'TwoRoundDeterministicReward-v0' 'OneRoundDeterministicReward-v0' 'MountainCar-v0' 'CartPole-v0' 'LunarLander-v2'
-        self.env_name = 'LunarLander-v2'
-        self.env_directory = '/Users/wulfebw/Desktop/gym/'
+        self.env_name = 'CartPole-v0'
+        self.env_directory = '../data/results'
         # environment is used to set the variables listed
         # below this comment. The reason for this is that 
         # this implementation is an adaption of another 
@@ -25,22 +25,27 @@ class DefaultOptions(object):
         self.low = None
 
         # network
-        self.framework = 'theano'
-        self.batch_size = 2 ** 8
+        # {dqn, rqn}
+        self.network_type = 'dqn'
+        self.batch_size = 2 ** 5
         # next two only used if no specific layer sizes
         self.num_hidden = 128
         self.num_hidden_layers = 3
         # hidden_layer_sizes used if it exists else, 
         # num_hidden_layers and num_hidden
-        self.hidden_layer_sizes = [128,128] 
-        # {relu, tanh, leaky_relu}
+        self.hidden_layer_sizes = [128,128,128] 
+        # {relu, tanh, leaky_relu, linear}
         self.nonlinearity = 'leaky_relu' 
-        # time to train for each episode run
+        # backprop through time steps or frames per state
+        self.sequence_length = 4
+        # number of training batches per episode
+        # recommend this to be 1
         self.train_updates_per_episode = 1
         # how many training updates between target network update
         self.freeze_interval = 10
         # l2 weight reg
-        self.regularization = 1e-6
+        self.regularization = 0
+        # initial learning rate
         self.learning_rate = 0.01
         # mininum lr allowed
         self.min_learning_rate = 0.00001
@@ -48,22 +53,26 @@ class DefaultOptions(object):
         self.decay_lr_every = 1000
         # exponential lr decay
         self.decay_lr_ratio = 0.9
-        # dropout prob = prob of dropping _not_ keeping 
-        self.dropout_prob = 0.2
-        self.discount = 1.0
-        # max norm used with tensorflow network
-        self.max_norm = 5
+        # dropout prob = prob of dropping, _not_ keeping 
+        self.dropout_prob = 0.0
+        # discount factor to use with networks
+        self.discount = .999
         # max quadratic used with theano network
         self.max_quadratic_loss = 50.0 
         # filepath from which to load network params
         self.load_weights_filepath = ''
-        # tensorflow only
-        self.use_multi_gpu = False
-        self.gpu_ids = [1,2,3]
+        # recurrent only
+        self.subnetwork_type = 'single_layer_lstm'
+        # recurrent network type to build
+        # {'single_layer_lstm', 'stacked_lstm', 
+        # 'clockwork_lstm', 'linear_rnn'}
+        # this will use num_hidden nodes for recurrent layer
+        # value gradients are clipped to
+        self.rnn_grad_clip = 100
         
         # policy
         # initil exploration probability
-        self.exploration_prob = 1.0
+        self.exploration_prob = 0.5
         # minimum allowed exploration probability
         self.min_exploration_prob = 0.1
         # exploration prob to use in validation
@@ -71,30 +80,36 @@ class DefaultOptions(object):
         # amount exploration is reduced every time 
         # _an action is selected_
         # so it's based on actions not training updates
-        self.exploration_reduction = 5e-7
+        self.exploration_reduction = 1e-7
 
         # replay memory
-        self.replay_capacity = 1e5
+        self.replay_capacity = 5e4
+
+        # state adapter
+        self.state_adapter_type = 'identity'
 
         # logger
+        # when print out running values, how many steps back to track
         self.log_steps_back = 10000
-        # epochs between logging weights
-        self.log_weights_every = 1e50
-        # epochs between logging stats
-        self.log_stats_every = 1e50
-        # where to log stats
-        self.log_directory = '../../../../data/snapshots/test_run/'
+        # episodes between logging weights
+        self.log_weights_every = 100
+        # episodes between logging stats
+        self.log_stats_every = 100
+        # where to log stats (directory will be created)
+        self.log_directory = '../data/snapshots/test_run/'
         # actions take up a lot of space so limit number tracked
         self.max_actions_tracked = 1e6
+        # whether or not to print information
         self.verbose = True
-        self.print_every = 100
+        # how often to print progress to console
+        self.print_every = 25
             
         # experiment
         # in_validation flag used to trigger validation
-        # settings during experiment
+        # settings during experiment, this is a hack
         self.in_validation = False
-        # episodes between validation run
-        self.validation_every = 10
+        # episodes between validation runs
+        self.validation_every = 25
         # number of episodes to run
         self.num_episodes = 100000
         # max number of steps in an episode
@@ -105,9 +120,6 @@ def parse_args(args):
     parser = argparse.ArgumentParser()
 
     # general args
-    parser.add_argument('-a', '--framework', dest='framework', 
-        help='framework to use {theano, tensorflow}',
-        type=str, default=opts.framework)
     parser.add_argument('-b', '--batch_size', dest='batch_size', 
         help='batch size to use', 
         type=int, default=opts.batch_size)

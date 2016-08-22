@@ -2,6 +2,9 @@
 import numpy as np
 
 class EpsilonGreedy(object):
+    """
+    An episilon greedy policy.
+    """
 
     def __init__(self, opts):
         self.opts = opts
@@ -11,6 +14,8 @@ class EpsilonGreedy(object):
         return np.random.choice(self.action_idxs)
 
     def choose_action_index(self, q_values):
+        # exploration prob changes based on whether we 
+        # are currently in validation
         exploration_prob = self.opts.exploration_prob
         if self.opts.in_validation:
             exploration_prob = self.opts.validation_exploration_prob
@@ -26,7 +31,8 @@ class EpsilonGreedy(object):
         return action_idx
 
     def update_parameters(self):
-        updated_exploration_prob = self.opts.exploration_prob \
-                                        - self.opts.exploration_reduction
-        self.opts.exploration_prob = max(self.opts.min_exploration_prob, \
+        # decay exploration prob
+        updated_exploration_prob = (self.opts.exploration_prob
+                                        - self.opts.exploration_reduction)
+        self.opts.exploration_prob = max(self.opts.min_exploration_prob,
                                         updated_exploration_prob)

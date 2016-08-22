@@ -1,8 +1,24 @@
+"""
+There are two replay memory implementations in this file.
+
+The first is a dictionary style memory that makes few
+assumptions about the form or consistency of the state. 
+It's not efficient, but can be extended for easy 
+prioritized sampling.
+
+The second is a buffer style memory that's efficient
+and works well with recurrent networks.
+"""
 
 import numpy as np
 import theano
 
 class ReplayMemory(object):
+    """
+    Nonsequential replay memory. Good if you want 
+    to implement weighted sampling or don't know much
+    about the states.
+    """
 
     def __init__(self, opts):
         self.opts = opts
@@ -60,6 +76,8 @@ class ReplayMemory(object):
 class SequenceReplayMemory(object):
     """
     This is from https://github.com/spragunr/deep_q_rl
+    Sequential replay memory. Good if you want to concat 
+    frames for multi-frame states or recurrent networks.
     """
     
     def __init__(self, opts):
