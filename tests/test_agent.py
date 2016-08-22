@@ -30,7 +30,7 @@ def get_options():
     opts = default_options.DefaultOptions()
     opts.log_weights_every = 1e50
     opts.log_stats_every = 1e50
-    opts.log_directory = '../../../../data/snapshots/test_run/'
+    opts.log_directory = '../data/snapshots/test_run/'
     opts.options_filepath = os.path.join(opts.log_directory, 'options.pkl')
     opts.weights_filepath = os.path.join(opts.log_directory, 'weights_{}.npz')
     opts.replay_capacity = 2000
